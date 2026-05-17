@@ -1,0 +1,450 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Motors MLM – Dashboard Contactos WA</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',system-ui,sans-serif}
+body{background:#f0f2f5;color:#333;font-size:13px}
+header{background:linear-gradient(135deg,#1a73e8,#0d47a1);color:#fff;padding:14px 24px;display:flex;align-items:center;gap:16px}
+header h1{font-size:17px;font-weight:700}
+header .sub{font-size:11px;opacity:.8;margin-left:auto;background:rgba(255,255,255,.15);padding:4px 10px;border-radius:12px}
+.tabs{display:flex;padding:0 24px;background:#fff;border-bottom:2px solid #e0e0e0;gap:2px}
+.tab{padding:11px 20px;cursor:pointer;font-size:13px;font-weight:500;border-bottom:3px solid transparent;margin-bottom:-2px;color:#666;transition:.15s}
+.tab.active{color:#1a73e8;border-bottom-color:#1a73e8;font-weight:600}
+.tab:hover{background:#f5f8ff;color:#1a73e8}
+.page{display:none;padding:18px 24px}
+.page.active{display:block}
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.kpi{background:#fff;border-radius:8px;padding:14px 16px;box-shadow:0 1px 3px rgba(0,0,0,.08);border-left:4px solid #1a73e8}
+.kpi.green{border-left-color:#34a853}.kpi.orange{border-left-color:#fbbc04}.kpi.purple{border-left-color:#9334e6}
+.kpi .label{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
+.kpi .value{font-size:24px;font-weight:700;color:#1a73e8;line-height:1}
+.kpi.green .value{color:#34a853}.kpi.orange .value{color:#e65100}.kpi.purple .value{color:#9334e6}
+.kpi .sub{font-size:11px;color:#777;margin-top:4px}
+.charts-row{display:grid;gap:14px;margin-bottom:16px}
+.charts-row.c21{grid-template-columns:2fr 1fr}
+.charts-row.c111{grid-template-columns:1fr 1fr 1fr}
+.charts-row.c12{grid-template-columns:1fr 2fr}
+.chart-box{background:#fff;border-radius:8px;padding:14px 16px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.chart-box h3{font-size:12px;font-weight:600;color:#555;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.chart-box canvas{max-height:200px}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:500;white-space:nowrap}
+.b-high{background:#e8f5e9;color:#1b5e20}.b-medium{background:#fff3e0;color:#e65100}.b-low{background:#e3f2fd;color:#1565c0}.b-sinseg{background:#f3e5f5;color:#6a1b9a}
+.b-post{background:#e8f5e9;color:#1b5e20}.b-pre{background:#fce4ec;color:#880e4f}.b-enc{background:#fff8e1;color:#f57f17}
+.b-c1{background:#e8f5e9;color:#1b5e20}.b-c2{background:#e3f2fd;color:#1565c0}.b-c3{background:#fff3e0;color:#e65100}
+.b-c4{background:#fce4ec;color:#880e4f}.b-c5{background:#f3e5f5;color:#6a1b9a}.b-c6{background:#f5f5f5;color:#616161}.b-c7{background:#e0f2f1;color:#004d40}
+.up{color:#1b5e20;font-weight:600}.dn{color:#c62828;font-weight:600}
+.grid-section{background:#fff;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.08);overflow:hidden;margin-bottom:16px}
+.grid-header{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid #eee}
+.grid-header h3{font-size:13px;font-weight:600;color:#444}
+.grid-header .right{display:flex;gap:8px;align-items:center}
+.filters{display:flex;gap:8px;flex-wrap:wrap;padding:8px 14px;background:#fafafa;border-bottom:1px solid #eee;align-items:center}
+.filters select,.filters input{padding:5px 9px;border:1px solid #ddd;border-radius:4px;font-size:12px;outline:none;height:28px}
+.filters label{font-size:11px;color:#777;font-weight:500}
+.filters select:focus,.filters input:focus{border-color:#1a73e8}
+.btn{padding:6px 13px;border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:500;display:inline-flex;align-items:center;gap:5px;height:28px}
+.btn-primary{background:#1a73e8;color:#fff}.btn-primary:hover{background:#1557b0}
+.btn-clear{background:#fff;color:#666;border:1px solid #ddd}.btn-clear:hover{background:#f5f5f5}
+.table-wrap{overflow:auto;max-height:380px}
+table{width:100%;border-collapse:collapse}
+th{background:#f8f9fa;padding:7px 10px;text-align:left;font-weight:600;color:#555;position:sticky;top:0;z-index:1;white-space:nowrap;border-bottom:2px solid #e0e0e0;cursor:pointer;user-select:none;font-size:11px}
+th:hover{background:#e8f0fe}
+td{padding:6px 10px;border-bottom:1px solid #f0f0f0;white-space:nowrap;font-size:12px}
+tr:hover td{background:#f8f9fa}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+.pagination{display:flex;align-items:center;gap:8px;padding:8px 14px;border-top:1px solid #eee;font-size:11px;color:#666}
+.page-info{flex:1}
+.pg-btn{padding:3px 10px;border:1px solid #ddd;border-radius:3px;cursor:pointer;background:#fff;font-size:11px}
+.pg-btn:hover{background:#f5f5f5}.pg-btn:disabled{opacity:.35;cursor:not-allowed}
+.cluster-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.cluster-card{background:#fff;border-radius:8px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,.08);border-top:4px solid #ccc;text-align:center}
+.cluster-card .cn{font-size:12px;font-weight:600;color:#555;margin-bottom:4px}
+.cluster-card .cv{font-size:30px;font-weight:700;margin:4px 0}
+.cluster-card .cs{font-size:11px;color:#888}
+</style>
+</head>
+<body>
+<header>
+  <h1>&#x1F4CA; Motors MLM &mdash; Leads &amp; WhatsApp Landing</h1>
+  <span class="sub">__MAX_SEM__ &middot; 09/04 &rarr; __DATE_TO__ &middot; actualizado: __LAST_UPDATE__ &middot; Cambio WA Landing: 07/05</span>
+</header>
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('total')">Dashboard Total</div>
+  <div class="tab" onclick="switchTab('detalle')">Detalle por CUS_CUST_ID</div>
+  <div class="tab" onclick="switchTab('clusters')">Clusters de Impacto</div>
+</div>
+
+<div id="tab-total" class="page active">
+  <div class="kpi-row" id="kpis"></div>
+  <div class="charts-row c21">
+    <div class="chart-box">
+      <h3>Leads diarios &mdash; Total &amp; WhatsApp <span style="font-size:10px;color:#ea4335;background:#fce4ec;padding:1px 6px;border-radius:8px;margin-left:4px">&#9660; 07-may: WA en landing</span></h3>
+      <canvas id="cDiario"></canvas>
+    </div>
+    <div class="chart-box">
+      <h3>Leads por semana <span id="sem6badge" style="margin-left:4px"></span></h3>
+      <canvas id="cSemanal"></canvas>
+    </div>
+  </div>
+  <div class="charts-row c111">
+    <div class="chart-box"><h3>Mix de canal &mdash; Semana actual</h3><canvas id="cMix"></canvas></div>
+    <div class="chart-box"><h3>Prom. diario por d&iacute;a de semana &mdash; Pre vs Post 07-may</h3><canvas id="cDow"></canvas></div>
+    <div class="chart-box"><h3>% WhatsApp por d&iacute;a de semana &mdash; Pre vs Post</h3><canvas id="cDowPct"></canvas></div>
+  </div>
+  <div class="grid-section">
+    <div class="grid-header">
+      <h3>Detalle diario</h3>
+      <div class="right"><button class="btn btn-primary" onclick="downloadCSV('diario')">&#x2B07; Descargar CSV</button></div>
+    </div>
+    <div class="table-wrap"><table id="tDiario"><thead></thead><tbody></tbody></table></div>
+    <div class="pagination">
+      <span class="page-info" id="piDiario"></span>
+      <button class="pg-btn" id="prevDiario" onclick="changePage('diario',-1)">&larr;</button>
+      <button class="pg-btn" id="nextDiario" onclick="changePage('diario',1)">&rarr;</button>
+    </div>
+  </div>
+</div>
+
+<div id="tab-detalle" class="page">
+  <div class="grid-section">
+    <div class="grid-header">
+      <h3>Resumen por CUS_CUST_ID <span id="det-count" style="font-weight:400;color:#888;font-size:12px"></span></h3>
+      <div class="right"><button class="btn btn-primary" onclick="downloadCSV('detalle')">&#x2B07; Descargar CSV filtrado</button></div>
+    </div>
+    <div class="filters">
+      <label>Segmento</label><select id="fNsm" onchange="applyFilters()"><option value="">Todos</option></select>
+      <label>Asesor</label><select id="fAsesor" onchange="applyFilters()"><option value="">Todos</option></select>
+      <label>Cluster</label><select id="fCluster" onchange="applyFilters()"><option value="">Todos</option></select>
+      <input id="fNombre" placeholder="Buscar nombre / ID..." oninput="applyFilters()" style="min-width:180px">
+      <button class="btn btn-clear" onclick="clearFilters()">&#x2715; Limpiar</button>
+    </div>
+    <div class="table-wrap"><table id="tDetalle"><thead></thead><tbody></tbody></table></div>
+    <div class="pagination">
+      <span class="page-info" id="piDetalle"></span>
+      <button class="pg-btn" id="prevDetalle" onclick="changePage('detalle',-1)">&larr;</button>
+      <button class="pg-btn" id="nextDetalle" onclick="changePage('detalle',1)">&rarr;</button>
+    </div>
+  </div>
+</div>
+
+<div id="tab-clusters" class="page">
+  <div class="cluster-grid" id="clusterCards"></div>
+  <div class="charts-row c12">
+    <div class="chart-box"><h3>Distribuci&oacute;n por cluster</h3><canvas id="cClusterDist"></canvas></div>
+    <div class="chart-box"><h3>Prom. semanal Pre vs Sem 5 (1&ordf; post cambio) por cluster</h3><canvas id="cClusterComp"></canvas></div>
+  </div>
+  <div class="grid-section">
+    <div class="grid-header">
+      <h3>Detalle de clusters <span id="cl-count" style="font-weight:400;color:#888;font-size:12px"></span></h3>
+      <div class="right"><button class="btn btn-primary" onclick="downloadCSV('clusters')">&#x2B07; Descargar CSV</button></div>
+    </div>
+    <div class="filters">
+      <label>Cluster</label><select id="fcCluster" onchange="applyCFilters()"><option value="">Todos</option></select>
+      <label>Segmento</label><select id="fcNsm" onchange="applyCFilters()"><option value="">Todos</option></select>
+      <label>Asesor</label><select id="fcAsesor" onchange="applyCFilters()"><option value="">Todos</option></select>
+      <input id="fcNombre" placeholder="Buscar nombre / ID..." oninput="applyCFilters()" style="min-width:180px">
+      <button class="btn btn-clear" onclick="clearCFilters()">&#x2715; Limpiar</button>
+    </div>
+    <div class="table-wrap"><table id="tClusters"><thead></thead><tbody></tbody></table></div>
+    <div class="pagination">
+      <span class="page-info" id="piClusters"></span>
+      <button class="pg-btn" id="prevClusters" onclick="changePage('clusters',-1)">&larr;</button>
+      <button class="pg-btn" id="nextClusters" onclick="changePage('clusters',1)">&rarr;</button>
+    </div>
+  </div>
+</div>
+
+<script>const RAW_DIARIO=__DATA_DIARIO__;
+const RAW_SEMANAL=__DATA_SEMANAL__;
+const RAW_DOW=__DATA_DOW__;
+const RAW_DETALLE=__DATA_DETALLE__;
+const WA_CHANGE_DATE='2026-05-07';
+const SEM_DAYS={1:6,2:7,3:7,4:7,5:7,6:4};
+const CLUSTER_DEF=[
+  {id:'Impacto Alto',    badge:'b-c1',color:'#34a853',desc:'Delta > 50%'},
+  {id:'Impacto Moderado',badge:'b-c2',color:'#4285f4',desc:'Delta 20-50%'},
+  {id:'Impacto Bajo',    badge:'b-c3',color:'#fbbc04',desc:'Delta 0-20%'},
+  {id:'Declive',         badge:'b-c4',color:'#ea4335',desc:'Delta < 0%'},
+  {id:'Nueva Actividad', badge:'b-c7',color:'#00897b',desc:'Sin pre, activo post'},
+  {id:'Inactivo',        badge:'b-c6',color:'#9e9e9e',desc:'Sin contactos'},
+];
+const CLUSTER_BADGES=Object.fromEntries(CLUSTER_DEF.map(c=>[c.id,c.badge]));
+const CLUSTER_COLORS=Object.fromEntries(CLUSTER_DEF.map(c=>[c.id,c.color]));
+
+// Enrich daily: add VS_DOW_PRE
+const DOW_PRE={};
+RAW_DIARIO.filter(r=>r.FECHA<WA_CHANGE_DATE).forEach(r=>{
+  if(!DOW_PRE[r.DIA_SEMANA])DOW_PRE[r.DIA_SEMANA]={s:0,n:0};
+  DOW_PRE[r.DIA_SEMANA].s+=r.TOTAL_CONTACTOS; DOW_PRE[r.DIA_SEMANA].n++;
+});
+Object.keys(DOW_PRE).forEach(d=>DOW_PRE[d].avg=DOW_PRE[d].s/DOW_PRE[d].n);
+const DATA_DIARIO=RAW_DIARIO.map(r=>{
+  const pa=DOW_PRE[r.DIA_SEMANA]?.avg||0;
+  const vs=pa>0?Math.round((r.TOTAL_CONTACTOS-pa)/pa*1000)/10:null;
+  return{...r,VS_DOW_PRE:vs};
+});
+
+// Enrich semanal: add VS_SEM_ANT, VS_PRE_AVG, INCOMPLETA
+const preSems=RAW_SEMANAL.filter(r=>r.SEM<=4);
+const preAvgDaily=preSems.reduce((s,r)=>s+r.TOTAL_CONTACTOS,0)/preSems.reduce((s,r)=>s+(SEM_DAYS[r.SEM]||7),0);
+const DATA_SEMANAL=RAW_SEMANAL.map((r,i,a)=>{
+  const days=SEM_DAYS[r.SEM]||7;
+  const rate=r.TOTAL_CONTACTOS/days;
+  const prev=i>0?a[i-1]:null;
+  const pRate=prev?prev.TOTAL_CONTACTOS/(SEM_DAYS[prev.SEM]||7):null;
+  const vsAnt=pRate?Math.round((rate-pRate)/pRate*1000)/10:null;
+  const vsPre=r.SEM>4?Math.round((rate-preAvgDaily)/preAvgDaily*1000)/10:null;
+  return{...r,DIAS:days,RATE_DIARIA:Math.round(rate*10)/10,VS_SEM_ANT:vsAnt,VS_PRE_AVG:vsPre,INCOMPLETA:r.SEM===6};
+});
+
+// Build dealer summary
+const dmap={};
+RAW_DETALLE.forEach(r=>{
+  if(!dmap[r.CUS_CUST_ID])dmap[r.CUS_CUST_ID]={CUS_CUST_ID:r.CUS_CUST_ID,NSM:r.SEGMENTACION_NSM,NOMBRE:r.NOMBRE_CLIENTE,ASESOR:r.ASESOR,w:{}};
+  dmap[r.CUS_CUST_ID].w[r.SEM]=r.TOTAL_CONTACTOS;
+});
+const DATA_DETALLE_SUM=Object.values(dmap).map(d=>{
+  const preT=[1,2,3,4].reduce((s,w)=>s+(d.w[w]||0),0);
+  const PRE=Math.round(preT/4*10)/10;
+  const S5=d.w[5]||0,S6=d.w[6]||0;
+  const S6p=Math.round(S6/4*7*10)/10;
+  const D5=PRE>0?Math.round((S5-PRE)/PRE*1000)/10:(S5>0?100:0);
+  const D6=PRE>0?Math.round((S6p-PRE)/PRE*1000)/10:(S6>0?100:0);
+  let CL;
+  if(PRE===0&&S5===0)CL='Inactivo';
+  else if(PRE===0&&S5>0)CL='Nueva Actividad';
+  else if(D5>50)CL='Impacto Alto';
+  else if(D5>20)CL='Impacto Moderado';
+  else if(D5>=0)CL='Impacto Bajo';
+  else CL='Declive';
+  return{CUS_CUST_ID:d.CUS_CUST_ID,SEGMENTACION_NSM:d.NSM,NOMBRE_CLIENTE:d.NOMBRE,ASESOR:d.ASESOR,
+    PROM_PRE_SEM:PRE,SEM5_LEADS:S5,DELTA_SEM5_PCT:D5,SEM6_PARCIAL:S6,SEM6_PROY_7D:S6p,DELTA_SEM6_PCT:D6,CLUSTER:CL};
+}).sort((a,b)=>b.SEM5_LEADS-a.SEM5_LEADS);
+
+// State
+const state={
+  diario:  {data:DATA_DIARIO,     filtered:DATA_DIARIO,     page:0,pageSize:15},
+  detalle: {data:DATA_DETALLE_SUM,filtered:DATA_DETALLE_SUM,page:0,pageSize:50},
+  clusters:{data:DATA_DETALLE_SUM,filtered:DATA_DETALLE_SUM,page:0,pageSize:50},
+};
+let sortSt={};
+
+const fmtN=v=>v!=null?Number(v).toLocaleString('es-MX',{maximumFractionDigits:1}):'--';
+const fmtPct=v=>v!=null?(v>=0?'<span class="up">+'+v+'%</span>':'<span class="dn">'+v+'%</span>'):'--';
+const nsm2b=v=>({'High':'b-high','Medium':'b-medium','Low':'b-low'}[v]||'b-sinseg');
+
+function switchTab(t){
+  document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',['total','detalle','clusters'][i]===t));
+  document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
+  document.getElementById('tab-'+t).classList.add('active');
+}
+
+function buildKPIs(){
+  const preS=RAW_SEMANAL.filter(r=>r.SEM<=4);
+  const promPre=Math.round(preS.reduce((s,r)=>s+r.TOTAL_CONTACTOS,0)/preS.length);
+  const sem5=RAW_SEMANAL.find(r=>r.SEM===5);
+  const sem6=RAW_SEMANAL.find(r=>r.SEM===6);
+  const s5=sem5?Math.round(sem5.TOTAL_CONTACTOS):0;
+  const s6raw=sem6?Math.round(sem6.TOTAL_CONTACTOS):0;
+  const s6proj=Math.round(s6raw/4*7); // proyectado a 7 dias
+  const d5=Math.round((s5-promPre)/promPre*100*10)/10;
+  const d6=Math.round((s6proj-promPre)/promPre*100*10)/10;
+  const dTotal=Math.round(((s5+s6proj)/2-promPre)/promPre*100*10)/10;
+  const pct=v=>'<span style="color:'+(v>0?'#1b5e20':'#c62828')+';font-size:12px">'+(v>0?'+':'')+v+'%</span>';
+  const kpis=[
+    {l:'Prom. semanal PRE cambio',  v:promPre.toLocaleString(), s:'Sem 1-4 &middot; 09-abr al 05-may',       cls:''},
+    {l:'Sem 1 POST cambio (sem 5)', v:s5.toLocaleString(),      s:'06-12 may &middot; '+pct(d5)+' vs pre',    cls:'green'},
+    {l:'Sem 2 POST cambio (sem 6)', v:s6raw.toLocaleString(),   s:'13-16 may &middot; proy 7d: '+s6proj.toLocaleString()+' &middot; '+pct(d6), cls:'green'},
+    {l:'Cambio total POST vs PRE',  v:(dTotal>0?'+':'')+dTotal+'%', s:'Prom sem 5+6 vs prom sem 1-4',         cls:'orange'},
+  ];
+  document.getElementById('kpis').innerHTML=kpis.map(k=>`<div class="kpi ${k.cls}"><div class="label">${k.l}</div><div class="value">${k.v}</div><div class="sub">${k.s}</div></div>`).join('');
+}
+
+function buildChartDiario(){
+  const ctx=document.getElementById('cDiario').getContext('2d');
+  new Chart(ctx,{type:'line',data:{
+    labels:DATA_DIARIO.map(r=>r.FECHA.slice(5)),
+    datasets:[
+      {label:'Total',data:DATA_DIARIO.map(r=>r.TOTAL_CONTACTOS),borderColor:'#1a73e8',backgroundColor:'rgba(26,115,232,.07)',tension:.3,pointRadius:1.5,fill:true,borderWidth:2},
+      {label:'WhatsApp',data:DATA_DIARIO.map(r=>r.WHATSAPP_UNICOS),borderColor:'#34a853',backgroundColor:'rgba(52,168,83,.05)',tension:.3,pointRadius:1.5,fill:true,borderWidth:2},
+    ]
+  },options:{plugins:{legend:{position:'top',labels:{boxWidth:10,font:{size:11}}},datalabels:{display:false}},
+    scales:{y:{beginAtZero:false,ticks:{font:{size:10}}}},interaction:{mode:'index',intersect:false}}});
+}
+
+function buildChartSemanal(){
+  document.getElementById('sem6badge').innerHTML='<span class="badge b-enc">en curso (4/7 dias)</span>';
+  const ctx=document.getElementById('cSemanal').getContext('2d');
+  const bg1=DATA_SEMANAL.map(r=>r.INCOMPLETA?'rgba(52,168,83,.5)':'#34a853');
+  const bg2=DATA_SEMANAL.map(r=>r.INCOMPLETA?'rgba(66,133,244,.4)':'#4285f4');
+  new Chart(ctx,{type:'bar',data:{
+    labels:DATA_SEMANAL.map(r=>'S'+r.SEM+(r.INCOMPLETA?' *':'')),
+    datasets:[
+      {label:'WhatsApp',data:DATA_SEMANAL.map(r=>r.WHATSAPP_UNICOS),backgroundColor:bg1,borderRadius:3},
+      {label:'Otros',data:DATA_SEMANAL.map(r=>r.TOTAL_CONTACTOS-r.WHATSAPP_UNICOS),backgroundColor:bg2,borderRadius:3},
+    ]
+  },options:{plugins:{legend:{position:'top',labels:{boxWidth:10,font:{size:11}}},datalabels:{display:false}},scales:{x:{stacked:true},y:{stacked:true,beginAtZero:true}}}});
+}
+
+function buildChartMix(){
+  const last=RAW_SEMANAL[RAW_SEMANAL.length-1];
+  const ctx=document.getElementById('cMix').getContext('2d');
+  new Chart(ctx,{type:'doughnut',data:{
+    labels:['WhatsApp','Call','Preguntas'],
+    datasets:[{data:[last.WHATSAPP_UNICOS,last.CALL_UNICOS,last.PREGUNTAS_UNICOS],
+      backgroundColor:['#34a853','#4285f4','#fbbc04'],borderWidth:2}]
+  },options:{plugins:{legend:{position:'right',labels:{boxWidth:10,font:{size:11}}},datalabels:{display:false}},cutout:'60%'}});
+}
+
+function buildChartDow(){
+  const order=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+  const s=order.map(d=>RAW_DOW.find(r=>r.DIA_SEMANA===d)).filter(Boolean);
+  const deltas=s.map(r=>+(( (r.WA_PROM_POST-r.WA_PROM_PRE)/r.WA_PROM_PRE*100).toFixed(1)));
+  const ctx=document.getElementById('cDow').getContext('2d');
+  new Chart(ctx,{type:'bar',data:{labels:s.map(r=>r.DIA_SEMANA.slice(0,3)),datasets:[
+    {label:'Pre 07-may', data:s.map(r=>r.WA_PROM_PRE), backgroundColor:'rgba(234,67,53,.65)',borderRadius:3,
+     datalabels:{display:false}},
+    {label:'Post 07-may',data:s.map(r=>r.WA_PROM_POST),backgroundColor:'rgba(52,168,83,.8)',borderRadius:3,
+     datalabels:{anchor:'end',align:'top',color:'#1b5e20',font:{weight:'bold',size:11},
+       formatter:(v,ctx)=>'+'+deltas[ctx.dataIndex]+'%'}},
+  ]},options:{
+    plugins:{
+      legend:{position:'top',labels:{boxWidth:10,font:{size:11}}},
+      datalabels:{display:true}
+    },
+    scales:{y:{beginAtZero:false}},
+    layout:{padding:{top:20}}
+  }});
+}
+
+function buildChartDowPct(){
+  const order=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+  const s=order.map(d=>RAW_DOW.find(r=>r.DIA_SEMANA===d)).filter(Boolean);
+  const ctx=document.getElementById('cDowPct').getContext('2d');
+  new Chart(ctx,{type:'bar',data:{labels:s.map(r=>r.DIA_SEMANA.slice(0,3)),datasets:[
+    {label:'% WA Pre',data:s.map(r=>r.PCT_WA_PRE),backgroundColor:'rgba(234,67,53,.65)',borderRadius:3},
+    {label:'% WA Post',data:s.map(r=>r.PCT_WA_POST),backgroundColor:'rgba(52,168,83,.8)',borderRadius:3},
+  ]},options:{plugins:{legend:{position:'top',labels:{boxWidth:10,font:{size:11}}},datalabels:{display:false}},scales:{y:{min:87,max:100}}}});
+}
+
+function buildClusters(){
+  const counts={},preA={},s5A={};
+  DATA_DETALLE_SUM.forEach(d=>{
+    counts[d.CLUSTER]=(counts[d.CLUSTER]||0)+1;
+    if(!preA[d.CLUSTER]){preA[d.CLUSTER]=[];s5A[d.CLUSTER]=[];}
+    preA[d.CLUSTER].push(d.PROM_PRE_SEM); s5A[d.CLUSTER].push(d.SEM5_LEADS);
+  });
+  document.getElementById('clusterCards').innerHTML=CLUSTER_DEF.map(c=>`
+    <div class="cluster-card" style="border-top-color:${c.color}">
+      <div class="cn">${c.id}</div>
+      <div class="cv" style="color:${c.color}">${counts[c.id]||0}</div>
+      <div class="cs">${c.desc} &middot; ${counts[c.id]?Math.round((counts[c.id]||0)/DATA_DETALLE_SUM.length*100):0}% del total</div>
+    </div>`).join('');
+  const avg=arr=>arr&&arr.length?Math.round(arr.reduce((s,v)=>s+v,0)/arr.length*10)/10:0;
+  const ctx1=document.getElementById('cClusterDist').getContext('2d');
+  new Chart(ctx1,{type:'doughnut',data:{labels:CLUSTER_DEF.map(c=>c.id),datasets:[{data:CLUSTER_DEF.map(c=>counts[c.id]||0),backgroundColor:CLUSTER_DEF.map(c=>c.color),borderWidth:2}]},options:{plugins:{legend:{position:'right',labels:{boxWidth:10,font:{size:11}}},datalabels:{display:false}},cutout:'55%'}});
+  const ctx2=document.getElementById('cClusterComp').getContext('2d');
+  new Chart(ctx2,{type:'bar',data:{labels:CLUSTER_DEF.map(c=>c.id),datasets:[
+    {label:'Prom Pre (sem/semana)',data:CLUSTER_DEF.map(c=>avg(preA[c.id])),backgroundColor:'rgba(234,67,53,.65)',borderRadius:3},
+    {label:'Sem 5 leads',data:CLUSTER_DEF.map(c=>avg(s5A[c.id])),backgroundColor:'rgba(52,168,83,.8)',borderRadius:3},
+  ]},options:{plugins:{legend:{position:'top',labels:{boxWidth:10,font:{size:11}}},datalabels:{display:false}},scales:{y:{beginAtZero:true}}}});
+  const clusters=[...new Set(DATA_DETALLE_SUM.map(r=>r.CLUSTER))].sort();
+  ['fCluster','fcCluster'].forEach(id=>{
+    const el=document.getElementById(id);
+    clusters.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;el.appendChild(o);});
+  });
+}
+
+// Column config
+const HIDE=new Set(['SOLICITUD_VISITA_UNICOS','QUOTATIONS_UNICOS','ORDEN','DIAS_PRE','DIAS_POST']);
+const NUMCOLS=new Set(['CALL_UNICOS','WHATSAPP_UNICOS','PREGUNTAS_UNICOS','TOTAL_CONTACTOS','RATE_DIARIA','WA_PROM_PRE','WA_PROM_POST','TOTAL_PROM_PRE','TOTAL_PROM_POST','DIAS','PROM_PRE_SEM','SEM5_LEADS','SEM6_PARCIAL','SEM6_PROY_7D']);
+const FMTS={
+  SEGMENTACION_NSM:v=>`<span class="badge ${nsm2b(v)}">${v}</span>`,
+  CLUSTER:v=>`<span class="badge ${CLUSTER_BADGES[v]||'b-c6'}">${v}</span>`,
+  PERIODO:v=>`<span class="badge ${v.startsWith('Post')?'b-post':'b-pre'}">${v}</span>`,
+  INCOMPLETA:v=>v?'<span class="badge b-enc">en curso</span>':'',
+  VS_SEM_ANT:fmtPct, VS_PRE_AVG:fmtPct, VS_DOW_PRE:fmtPct,
+  DELTA_SEM5_PCT:fmtPct, DELTA_SEM6_PCT:fmtPct,
+  PCT_WHATSAPP:v=>v+'%', PCT_WA_PRE:v=>v+'%', PCT_WA_POST:v=>v+'%',
+  WA_DELTA_PCT:v=>'<span class="up">+'+v+'%</span>',
+};
+
+function renderTable(id,rows,page,ps){
+  const cap=id.charAt(0).toUpperCase()+id.slice(1);
+  const tbl=document.getElementById('t'+cap);
+  if(!rows.length){tbl.querySelector('tbody').innerHTML='<tr><td colspan="20" style="text-align:center;padding:20px;color:#888">Sin resultados</td></tr>';return;}
+  const cols=Object.keys(rows[0]).filter(c=>!HIDE.has(c));
+  tbl.querySelector('thead').innerHTML='<tr>'+cols.map(c=>`<th onclick="sortTable('${id}','${c}')">${c.replace(/_/g,' ')}</th>`).join('')+'</tr>';
+  const s=page*ps,e=Math.min(s+ps,rows.length);
+  tbl.querySelector('tbody').innerHTML=rows.slice(s,e).map(r=>
+    '<tr>'+cols.map(c=>{const v=r[c];const f=FMTS[c];if(f)return'<td>'+f(v)+'</td>';if(NUMCOLS.has(c))return`<td class="num">${v!=null?fmtN(v):'--'}</td>`;return`<td>${v??'--'}</td>`}).join('')+'</tr>'
+  ).join('');
+  const pi=document.getElementById('pi'+cap);
+  if(pi)pi.textContent=`${s+1}-${e} de ${rows.length}`;
+  const pv=document.getElementById('prev'+cap),nx=document.getElementById('next'+cap);
+  if(pv)pv.disabled=page===0;if(nx)nx.disabled=e>=rows.length;
+}
+
+function changePage(id,dir){
+  const s=state[id];s.page=Math.max(0,Math.min(s.page+dir,Math.ceil(s.filtered.length/s.pageSize)-1));
+  renderTable(id,s.filtered,s.page,s.pageSize);
+}
+function sortTable(id,col){
+  const s=state[id];const k=id+col;sortSt[k]=sortSt[k]==='asc'?'desc':'asc';
+  const d=sortSt[k]==='asc'?1:-1;
+  s.filtered=[...s.filtered].sort((a,b)=>typeof a[col]==='number'?d*(a[col]-b[col]):d*String(a[col]||'').localeCompare(String(b[col]||'')));
+  s.page=0;renderTable(id,s.filtered,s.page,s.pageSize);
+}
+
+function buildDetFilters(){
+  const fill=(id,vals)=>{const el=document.getElementById(id);vals.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;el.appendChild(o);});};
+  fill('fNsm',[...new Set(DATA_DETALLE_SUM.map(r=>r.SEGMENTACION_NSM))].sort());
+  fill('fAsesor',[...new Set(DATA_DETALLE_SUM.map(r=>r.ASESOR))].sort());
+}
+function applyFilters(){
+  const nsm=document.getElementById('fNsm').value,as=document.getElementById('fAsesor').value,cl=document.getElementById('fCluster').value,q=document.getElementById('fNombre').value.toLowerCase();
+  state.detalle.filtered=DATA_DETALLE_SUM.filter(r=>(!nsm||r.SEGMENTACION_NSM===nsm)&&(!as||r.ASESOR===as)&&(!cl||r.CLUSTER===cl)&&(!q||String(r.CUS_CUST_ID).includes(q)||String(r.NOMBRE_CLIENTE).toLowerCase().includes(q)));
+  state.detalle.page=0;
+  document.getElementById('det-count').textContent='('+state.detalle.filtered.length+' cuentas)';
+  renderTable('detalle',state.detalle.filtered,0,state.detalle.pageSize);
+}
+function clearFilters(){['fNsm','fAsesor','fCluster'].forEach(id=>document.getElementById(id).value='');document.getElementById('fNombre').value='';applyFilters();}
+
+function buildCFilters(){
+  const fill=(id,vals)=>{const el=document.getElementById(id);vals.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;el.appendChild(o);});};
+  fill('fcNsm',[...new Set(DATA_DETALLE_SUM.map(r=>r.SEGMENTACION_NSM))].sort());
+  fill('fcAsesor',[...new Set(DATA_DETALLE_SUM.map(r=>r.ASESOR))].sort());
+}
+function applyCFilters(){
+  const cl=document.getElementById('fcCluster').value,nsm=document.getElementById('fcNsm').value,as=document.getElementById('fcAsesor').value,q=document.getElementById('fcNombre').value.toLowerCase();
+  state.clusters.filtered=DATA_DETALLE_SUM.filter(r=>(!cl||r.CLUSTER===cl)&&(!nsm||r.SEGMENTACION_NSM===nsm)&&(!as||r.ASESOR===as)&&(!q||String(r.CUS_CUST_ID).includes(q)||String(r.NOMBRE_CLIENTE).toLowerCase().includes(q)));
+  state.clusters.page=0;
+  document.getElementById('cl-count').textContent='('+state.clusters.filtered.length+' cuentas)';
+  renderTable('clusters',state.clusters.filtered,0,state.clusters.pageSize);
+}
+function clearCFilters(){['fcCluster','fcNsm','fcAsesor'].forEach(id=>document.getElementById(id).value='');document.getElementById('fcNombre').value='';applyCFilters();}
+
+function downloadCSV(id){
+  const rows=state[id].filtered;if(!rows.length)return;
+  const cols=Object.keys(rows[0]).filter(c=>!HIDE.has(c));
+  const esc=v=>{const s=String(v??'');return(s.includes(',')||s.includes('"'))?'"'+s.replace(/"/g,'""')+'"':s;};
+  const csv=[cols.join(','),...rows.map(r=>cols.map(c=>esc(r[c])).join(','))].join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+  a.download='motors_mlm_'+id+'_'+new Date().toISOString().slice(0,10)+'.csv';a.click();
+}
+
+// Register datalabels plugin globally
+Chart.register(ChartDataLabels);
+
+// Init
+buildKPIs();
+buildChartDiario();buildChartSemanal();buildChartMix();buildChartDow();buildChartDowPct();
+renderTable('diario',state.diario.filtered,0,state.diario.pageSize);
+buildDetFilters();applyFilters();
+buildClusters();buildCFilters();applyCFilters();
+</script>
+</body>
+</html>
