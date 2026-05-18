@@ -157,6 +157,27 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
   </div>
 </div>
 
+<div id="tab-correlaciones" class="page">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+    <div class="chart-box"><h3>Publicaciones activas promedio por cluster</h3><canvas id="cCorrLL"></canvas></div>
+    <div class="chart-box"><h3>Contactos ultimos 30 dias promedio por cluster</h3><canvas id="cCorrCont"></canvas></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+    <div class="chart-box"><h3>Valor packs promedio por cluster</h3><canvas id="cCorrPacks"></canvas></div>
+    <div class="chart-box"><h3>Segmentacion NSM por cluster (%)</h3><canvas id="cCorrNSM"></canvas></div>
+  </div>
+  <div class="grid-section">
+    <div class="grid-header">
+      <h3>Detalle de correlaciones por cluster</h3>
+      <button class="btn btn-primary" onclick="downloadCSV('corr')">&#x2B07; Descargar CSV</button>
+    </div>
+    <div class="table-wrap"><table id="tCorr"><thead></thead><tbody></tbody></table></div>
+  </div>
+  <div style="background:#fff;border-radius:8px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.08);margin-top:14px">
+    <h3 style="font-size:13px;font-weight:600;color:#444;margin-bottom:12px">Hallazgos clave</h3>
+    <div id="corrInsights" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12px"></div>
+  </div>
+</div>
 <script>const RAW_DIARIO=[{"DIA_SEMANA":"Thursday","FECHA":"2026-04-09","PERIODO":"Pre 07-may","SEM":1,"CALL_UNICOS":225,"WHATSAPP_UNICOS":3813,"PREGUNTAS_UNICOS":114,"TOTAL_CONTACTOS":4152},{"DIA_SEMANA":"Friday","FECHA":"2026-04-10","PERIODO":"Pre 07-may","SEM":1,"CALL_UNICOS":224,"WHATSAPP_UNICOS":3613,"PREGUNTAS_UNICOS":103,"TOTAL_CONTACTOS":3940},{"DIA_SEMANA":"Saturday","FECHA":"2026-04-11","PERIODO":"Pre 07-may","SEM":1,"CALL_UNICOS":188,"WHATSAPP_UNICOS":3422,"PREGUNTAS_UNICOS":102,"TOTAL_CONTACTOS":3712},{"DIA_SEMANA":"Sunday","FECHA":"2026-04-12","PERIODO":"Pre 07-may","SEM":1,"CALL_UNICOS":138,"WHATSAPP_UNICOS":3319,"PREGUNTAS_UNICOS":113,"TOTAL_CONTACTOS":3570},{"DIA_SEMANA":"Monday","FECHA":"2026-04-13","PERIODO":"Pre 07-may","SEM":1,"CALL_UNICOS":209,"WHATSAPP_UNICOS":3840,"PREGUNTAS_UNICOS":139,"TOTAL_CONTACTOS":4188},{"DIA_SEMANA":"Tuesday","FECHA":"2026-04-14","PERIODO":"Pre 07-may","SEM":1,"CALL_UNICOS":224,"WHATSAPP_UNICOS":4259,"PREGUNTAS_UNICOS":99,"TOTAL_CONTACTOS":4582},{"DIA_SEMANA":"Wednesday","FECHA":"2026-04-15","PERIODO":"Pre 07-may","SEM":2,"CALL_UNICOS":231,"WHATSAPP_UNICOS":4195,"PREGUNTAS_UNICOS":126,"TOTAL_CONTACTOS":4552},{"DIA_SEMANA":"Thursday","FECHA":"2026-04-16","PERIODO":"Pre 07-may","SEM":2,"CALL_UNICOS":210,"WHATSAPP_UNICOS":3918,"PREGUNTAS_UNICOS":119,"TOTAL_CONTACTOS":4247},{"DIA_SEMANA":"Friday","FECHA":"2026-04-17","PERIODO":"Pre 07-may","SEM":2,"CALL_UNICOS":197,"WHATSAPP_UNICOS":3772,"PREGUNTAS_UNICOS":99,"TOTAL_CONTACTOS":4068},{"DIA_SEMANA":"Saturday","FECHA":"2026-04-18","PERIODO":"Pre 07-may","SEM":2,"CALL_UNICOS":204,"WHATSAPP_UNICOS":3434,"PREGUNTAS_UNICOS":113,"TOTAL_CONTACTOS":3751},{"DIA_SEMANA":"Sunday","FECHA":"2026-04-19","PERIODO":"Pre 07-may","SEM":2,"CALL_UNICOS":135,"WHATSAPP_UNICOS":3252,"PREGUNTAS_UNICOS":72,"TOTAL_CONTACTOS":3459},{"DIA_SEMANA":"Monday","FECHA":"2026-04-20","PERIODO":"Pre 07-may","SEM":2,"CALL_UNICOS":214,"WHATSAPP_UNICOS":3698,"PREGUNTAS_UNICOS":127,"TOTAL_CONTACTOS":4039},{"DIA_SEMANA":"Tuesday","FECHA":"2026-04-21","PERIODO":"Pre 07-may","SEM":2,"CALL_UNICOS":207,"WHATSAPP_UNICOS":4160,"PREGUNTAS_UNICOS":117,"TOTAL_CONTACTOS":4484},{"DIA_SEMANA":"Wednesday","FECHA":"2026-04-22","PERIODO":"Pre 07-may","SEM":3,"CALL_UNICOS":239,"WHATSAPP_UNICOS":4278,"PREGUNTAS_UNICOS":114,"TOTAL_CONTACTOS":4631},{"DIA_SEMANA":"Thursday","FECHA":"2026-04-23","PERIODO":"Pre 07-may","SEM":3,"CALL_UNICOS":237,"WHATSAPP_UNICOS":4114,"PREGUNTAS_UNICOS":94,"TOTAL_CONTACTOS":4445},{"DIA_SEMANA":"Friday","FECHA":"2026-04-24","PERIODO":"Pre 07-may","SEM":3,"CALL_UNICOS":202,"WHATSAPP_UNICOS":3851,"PREGUNTAS_UNICOS":104,"TOTAL_CONTACTOS":4157},{"DIA_SEMANA":"Saturday","FECHA":"2026-04-25","PERIODO":"Pre 07-may","SEM":3,"CALL_UNICOS":165,"WHATSAPP_UNICOS":3676,"PREGUNTAS_UNICOS":96,"TOTAL_CONTACTOS":3937},{"DIA_SEMANA":"Sunday","FECHA":"2026-04-26","PERIODO":"Pre 07-may","SEM":3,"CALL_UNICOS":137,"WHATSAPP_UNICOS":3383,"PREGUNTAS_UNICOS":90,"TOTAL_CONTACTOS":3610},{"DIA_SEMANA":"Monday","FECHA":"2026-04-27","PERIODO":"Pre 07-may","SEM":3,"CALL_UNICOS":231,"WHATSAPP_UNICOS":3856,"PREGUNTAS_UNICOS":87,"TOTAL_CONTACTOS":4174},{"DIA_SEMANA":"Tuesday","FECHA":"2026-04-28","PERIODO":"Pre 07-may","SEM":3,"CALL_UNICOS":221,"WHATSAPP_UNICOS":4125,"PREGUNTAS_UNICOS":112,"TOTAL_CONTACTOS":4458},{"DIA_SEMANA":"Wednesday","FECHA":"2026-04-29","PERIODO":"Pre 07-may","SEM":4,"CALL_UNICOS":225,"WHATSAPP_UNICOS":3918,"PREGUNTAS_UNICOS":113,"TOTAL_CONTACTOS":4256},{"DIA_SEMANA":"Thursday","FECHA":"2026-04-30","PERIODO":"Pre 07-may","SEM":4,"CALL_UNICOS":229,"WHATSAPP_UNICOS":3555,"PREGUNTAS_UNICOS":73,"TOTAL_CONTACTOS":3857},{"DIA_SEMANA":"Friday","FECHA":"2026-05-01","PERIODO":"Pre 07-may","SEM":4,"CALL_UNICOS":168,"WHATSAPP_UNICOS":3534,"PREGUNTAS_UNICOS":101,"TOTAL_CONTACTOS":3803},{"DIA_SEMANA":"Saturday","FECHA":"2026-05-02","PERIODO":"Pre 07-may","SEM":4,"CALL_UNICOS":209,"WHATSAPP_UNICOS":3613,"PREGUNTAS_UNICOS":82,"TOTAL_CONTACTOS":3904},{"DIA_SEMANA":"Sunday","FECHA":"2026-05-03","PERIODO":"Pre 07-may","SEM":4,"CALL_UNICOS":147,"WHATSAPP_UNICOS":3187,"PREGUNTAS_UNICOS":99,"TOTAL_CONTACTOS":3433},{"DIA_SEMANA":"Monday","FECHA":"2026-05-04","PERIODO":"Pre 07-may","SEM":4,"CALL_UNICOS":239,"WHATSAPP_UNICOS":3675,"PREGUNTAS_UNICOS":103,"TOTAL_CONTACTOS":4017},{"DIA_SEMANA":"Tuesday","FECHA":"2026-05-05","PERIODO":"Pre 07-may","SEM":4,"CALL_UNICOS":201,"WHATSAPP_UNICOS":4046,"PREGUNTAS_UNICOS":124,"TOTAL_CONTACTOS":4371},{"DIA_SEMANA":"Wednesday","FECHA":"2026-05-06","PERIODO":"Pre 07-may","SEM":5,"CALL_UNICOS":214,"WHATSAPP_UNICOS":3709,"PREGUNTAS_UNICOS":108,"TOTAL_CONTACTOS":4031},{"DIA_SEMANA":"Thursday","FECHA":"2026-05-07","PERIODO":"Post 07-may (WA landing)","SEM":5,"CALL_UNICOS":204,"WHATSAPP_UNICOS":5116,"PREGUNTAS_UNICOS":96,"TOTAL_CONTACTOS":5416},{"DIA_SEMANA":"Friday","FECHA":"2026-05-08","PERIODO":"Post 07-may (WA landing)","SEM":5,"CALL_UNICOS":212,"WHATSAPP_UNICOS":5355,"PREGUNTAS_UNICOS":104,"TOTAL_CONTACTOS":5671},{"DIA_SEMANA":"Saturday","FECHA":"2026-05-09","PERIODO":"Post 07-may (WA landing)","SEM":5,"CALL_UNICOS":177,"WHATSAPP_UNICOS":5176,"PREGUNTAS_UNICOS":95,"TOTAL_CONTACTOS":5448},{"DIA_SEMANA":"Sunday","FECHA":"2026-05-10","PERIODO":"Post 07-may (WA landing)","SEM":5,"CALL_UNICOS":107,"WHATSAPP_UNICOS":4833,"PREGUNTAS_UNICOS":92,"TOTAL_CONTACTOS":5032},{"DIA_SEMANA":"Monday","FECHA":"2026-05-11","PERIODO":"Post 07-may (WA landing)","SEM":5,"CALL_UNICOS":187,"WHATSAPP_UNICOS":5331,"PREGUNTAS_UNICOS":91,"TOTAL_CONTACTOS":5609},{"DIA_SEMANA":"Tuesday","FECHA":"2026-05-12","PERIODO":"Post 07-may (WA landing)","SEM":5,"CALL_UNICOS":172,"WHATSAPP_UNICOS":5772,"PREGUNTAS_UNICOS":91,"TOTAL_CONTACTOS":6035},{"DIA_SEMANA":"Wednesday","FECHA":"2026-05-13","PERIODO":"Post 07-may (WA landing)","SEM":6,"CALL_UNICOS":191,"WHATSAPP_UNICOS":6008,"PREGUNTAS_UNICOS":102,"TOTAL_CONTACTOS":6301},{"DIA_SEMANA":"Thursday","FECHA":"2026-05-14","PERIODO":"Post 07-may (WA landing)","SEM":6,"CALL_UNICOS":195,"WHATSAPP_UNICOS":5826,"PREGUNTAS_UNICOS":124,"TOTAL_CONTACTOS":6145},{"DIA_SEMANA":"Friday","FECHA":"2026-05-15","PERIODO":"Post 07-may (WA landing)","SEM":6,"CALL_UNICOS":179,"WHATSAPP_UNICOS":5555,"PREGUNTAS_UNICOS":86,"TOTAL_CONTACTOS":5820},{"DIA_SEMANA":"Saturday","FECHA":"2026-05-16","PERIODO":"Post 07-may (WA landing)","SEM":6,"CALL_UNICOS":199,"WHATSAPP_UNICOS":5520,"PREGUNTAS_UNICOS":88,"TOTAL_CONTACTOS":5807},{"DIA_SEMANA":"Sunday","FECHA":"2026-05-17","PERIODO":"Post 07-may (WA landing)","SEM":6,"CALL_UNICOS":151,"WHATSAPP_UNICOS":5549,"PREGUNTAS_UNICOS":82,"TOTAL_CONTACTOS":5782}];
 const RAW_SEMANAL=[{"FECHA_FIN":"2026-04-14","FECHA_INICIO":"2026-04-09","SEM":1,"DIAS":6,"CALL_UNICOS":1208,"WHATSAPP_UNICOS":22266,"PREGUNTAS_UNICOS":670,"TOTAL_CONTACTOS":24144,"PCT_WHATSAPP":92.2},{"FECHA_FIN":"2026-04-21","FECHA_INICIO":"2026-04-15","SEM":2,"DIAS":7,"CALL_UNICOS":1398,"WHATSAPP_UNICOS":26429,"PREGUNTAS_UNICOS":773,"TOTAL_CONTACTOS":28600,"PCT_WHATSAPP":92.4},{"FECHA_FIN":"2026-04-28","FECHA_INICIO":"2026-04-22","SEM":3,"DIAS":7,"CALL_UNICOS":1432,"WHATSAPP_UNICOS":27283,"PREGUNTAS_UNICOS":697,"TOTAL_CONTACTOS":29412,"PCT_WHATSAPP":92.8},{"FECHA_FIN":"2026-05-05","FECHA_INICIO":"2026-04-29","SEM":4,"DIAS":7,"CALL_UNICOS":1418,"WHATSAPP_UNICOS":25528,"PREGUNTAS_UNICOS":695,"TOTAL_CONTACTOS":27641,"PCT_WHATSAPP":92.4},{"FECHA_FIN":"2026-05-12","FECHA_INICIO":"2026-05-06","SEM":5,"DIAS":7,"CALL_UNICOS":1273,"WHATSAPP_UNICOS":35292,"PREGUNTAS_UNICOS":677,"TOTAL_CONTACTOS":37242,"PCT_WHATSAPP":94.8},{"FECHA_FIN":"2026-05-17","FECHA_INICIO":"2026-05-13","SEM":6,"DIAS":5,"CALL_UNICOS":915,"WHATSAPP_UNICOS":28458,"PREGUNTAS_UNICOS":482,"TOTAL_CONTACTOS":29855,"PCT_WHATSAPP":95.3}];
 const RAW_DOW=[{"DIA_SEMANA":"Monday","ORDEN":1,"DIAS_PRE":4,"DIAS_POST":1,"WA_PROM_PRE":3767.2,"WA_PROM_POST":5331,"WA_DELTA_PCT":41.5,"TOTAL_PROM_PRE":4104.5,"TOTAL_PROM_POST":5609,"PCT_WA_PRE":367.1,"PCT_WA_POST":95},{"DIA_SEMANA":"Tuesday","ORDEN":2,"DIAS_PRE":4,"DIAS_POST":1,"WA_PROM_PRE":4147.5,"WA_PROM_POST":5772,"WA_DELTA_PCT":39.2,"TOTAL_PROM_PRE":4473.8,"TOTAL_PROM_POST":6035,"PCT_WA_PRE":370.8,"PCT_WA_POST":95.6},{"DIA_SEMANA":"Wednesday","ORDEN":3,"DIAS_PRE":4,"DIAS_POST":1,"WA_PROM_PRE":4025,"WA_PROM_POST":6008,"WA_DELTA_PCT":49.3,"TOTAL_PROM_PRE":4367.5,"TOTAL_PROM_POST":6301,"PCT_WA_PRE":368.6,"PCT_WA_POST":95.3},{"DIA_SEMANA":"Thursday","ORDEN":4,"DIAS_PRE":4,"DIAS_POST":2,"WA_PROM_PRE":3850,"WA_PROM_POST":5471,"WA_DELTA_PCT":42.1,"TOTAL_PROM_PRE":4175.2,"TOTAL_PROM_POST":5780.5,"PCT_WA_PRE":368.8,"PCT_WA_POST":189.3},{"DIA_SEMANA":"Friday","ORDEN":5,"DIAS_PRE":4,"DIAS_POST":2,"WA_PROM_PRE":3692.5,"WA_PROM_POST":5455,"WA_DELTA_PCT":47.7,"TOTAL_PROM_PRE":3992,"TOTAL_PROM_POST":5745.5,"PCT_WA_PRE":370,"PCT_WA_POST":189.9},{"DIA_SEMANA":"Saturday","ORDEN":6,"DIAS_PRE":4,"DIAS_POST":2,"WA_PROM_PRE":3536.2,"WA_PROM_POST":5348,"WA_DELTA_PCT":51.2,"TOTAL_PROM_PRE":3826,"TOTAL_PROM_POST":5627.5,"PCT_WA_PRE":369.7,"PCT_WA_POST":190.1},{"DIA_SEMANA":"Sunday","ORDEN":7,"DIAS_PRE":4,"DIAS_POST":2,"WA_PROM_PRE":3285.2,"WA_PROM_POST":5191,"WA_DELTA_PCT":58,"TOTAL_PROM_PRE":3518,"TOTAL_PROM_POST":5407,"PCT_WA_PRE":373.5,"PCT_WA_POST":192}];
@@ -262,8 +283,8 @@ function buildKPIs(){
   const dTotal=promPre>0?Math.round(((s1post+s2proj)/2-promPre)/promPre*1000)/10:0;
   const pct=v=>'<span style="color:'+(v>0?'#1b5e20':'#c62828')+';font-size:12px">'+(v>0?'+':'')+v+'%</span>';
   const kpis=[
-    {l:'Prom. semanal PRE cambio',   v:promPre.toLocaleString(),  s:'Sem 1-4 &middot; 09-abr al 05-may (4 sem completas)', cls:''},
-    {l:'Sem 1 POST cambio',          v:s1post.toLocaleString(),   s:'07-13 may ('+s1days+' d&iacute;as) &middot; '+pct(d1)+' vs pre', cls:'green'},
+    {l:'Prom. semanal PRE cambio',   v:promPre.toLocaleString(),  s:'Sem 1-4 &middot; 09-abr al 05-may &middot; preS='+preS.length+' sems', cls:''},
+    {l:'Sem 1 POST cambio',          v:s1post.toLocaleString(),   s:'07-13 may &middot; '+s1days+' dias &middot; '+pct(d1)+' vs pre', cls:'green'},
     {l:'Sem 2 POST cambio',          v:s2raw.toLocaleString(),    s:'14-may al '+lastDate+' &middot; proy 7d: '+s2proj.toLocaleString()+' &middot; '+pct(d2), cls:d2>=0?'green':'red'},
     {l:'Cambio total POST vs PRE',   v:(dTotal>0?'+':'')+dTotal+'%', s:'Prom sem1+sem2proy vs prom PRE',                   cls:dTotal>=0?'green':'red'},
   ];
@@ -538,25 +559,5 @@ buildDetFilters();applyFilters();
 buildClusters();buildCFilters();applyCFilters();
 buildCorrelaciones();
 </script>
-<div id="tab-correlaciones" class="page">
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
-    <div class="chart-box"><h3>Publicaciones activas promedio por cluster</h3><canvas id="cCorrLL"></canvas></div>
-    <div class="chart-box"><h3>Contactos ultimos 30 dias promedio por cluster</h3><canvas id="cCorrCont"></canvas></div>
-  </div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
-    <div class="chart-box"><h3>Valor packs promedio por cluster</h3><canvas id="cCorrPacks"></canvas></div>
-    <div class="chart-box"><h3>Segmentacion NSM por cluster (%)</h3><canvas id="cCorrNSM"></canvas></div>
-  </div>
-  <div class="grid-section">
-    <div class="grid-header">
-      <h3>Detalle de correlaciones por cluster</h3>
-      <button class="btn btn-primary" onclick="downloadCSV('corr')">&#x2B07; Descargar CSV</button>
-    </div>
-    <div class="table-wrap"><table id="tCorr"><thead></thead><tbody></tbody></table></div>
-  </div>
-  <div style="background:#fff;border-radius:8px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.08);margin-top:14px">
-    <h3 style="font-size:13px;font-weight:600;color:#444;margin-bottom:12px">Hallazgos clave</h3>
-    <div id="corrInsights" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12px"></div>
-  </div>
-</div></body>
-</html>
+
+</body></html>
