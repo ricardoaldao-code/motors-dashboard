@@ -19,10 +19,10 @@ header .sub{font-size:11px;opacity:.8;margin-left:auto;background:rgba(255,255,2
 .page.active{display:block}
 .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
 .kpi{background:#fff;border-radius:8px;padding:14px 16px;box-shadow:0 1px 3px rgba(0,0,0,.08);border-left:4px solid #1a73e8}
-.kpi.green{border-left-color:#34a853}.kpi.orange{border-left-color:#fbbc04}.kpi.purple{border-left-color:#9334e6}
+.kpi.green{border-left-color:#34a853}.kpi.orange{border-left-color:#fbbc04}.kpi.purple{border-left-color:#9334e6}.kpi.red{border-left-color:#ea4335}
 .kpi .label{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
 .kpi .value{font-size:24px;font-weight:700;color:#1a73e8;line-height:1}
-.kpi.green .value{color:#34a853}.kpi.orange .value{color:#e65100}.kpi.purple .value{color:#9334e6}
+.kpi.green .value{color:#34a853}.kpi.orange .value{color:#e65100}.kpi.purple .value{color:#9334e6}.kpi.red .value{color:#ea4335}
 .kpi .sub{font-size:11px;color:#777;margin-top:4px}
 .charts-row{display:grid;gap:14px;margin-bottom:16px}
 .charts-row.c21{grid-template-columns:2fr 1fr}
@@ -258,7 +258,7 @@ function buildKPIs(){
     {l:'Prom. semanal PRE cambio',  v:promPre.toLocaleString(), s:'Sem 1-4 &middot; 09-abr al 05-may',       cls:''},
     {l:'Sem 1 POST cambio (sem 5)', v:s5.toLocaleString(),      s:'06-12 may &middot; '+pct(d5)+' vs pre',    cls:'green'},
     {l:'Sem 2 POST cambio (sem 6)', v:s6raw.toLocaleString(),   s:'13-16 may &middot; proy 7d: '+s6proj.toLocaleString()+' &middot; '+pct(d6), cls:'green'},
-    {l:'Cambio total POST vs PRE',  v:(dTotal>0?'+':'')+dTotal+'%', s:'Prom sem 5+6 vs prom sem 1-4',         cls:'orange'},
+    {l:'Cambio total POST vs PRE',  v:(dTotal>0?'+':'')+dTotal+'%', s:'Prom sem 5+6 vs prom sem 1-4',         cls:dTotal>=0?'green':'red'},
   ];
   document.getElementById('kpis').innerHTML=kpis.map(k=>`<div class="kpi ${k.cls}"><div class="label">${k.l}</div><div class="value">${k.v}</div><div class="sub">${k.s}</div></div>`).join('');
 }
