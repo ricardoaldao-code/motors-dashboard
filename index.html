@@ -243,22 +243,29 @@ function switchTab(t){
 }
 
 function buildKPIs(){
+  // PRE: semanas 1-4 completas (09-abr al 05-may), promedio semanal
   const preS=RAW_SEMANAL.filter(r=>r.SEM<=4);
-  const promPre=Math.round(preS.reduce((s,r)=>s+r.TOTAL_CONTACTOS,0)/preS.length);
-  const sem5=RAW_SEMANAL.find(r=>r.SEM===5);
-  const sem6=RAW_SEMANAL.find(r=>r.SEM===6);
-  const s5=sem5?Math.round(sem5.TOTAL_CONTACTOS):0;
-  const s6raw=sem6?Math.round(sem6.TOTAL_CONTACTOS):0;
-  const s6proj=Math.round(s6raw/4*7); // proyectado a 7 dias
-  const d5=Math.round((s5-promPre)/promPre*100*10)/10;
-  const d6=Math.round((s6proj-promPre)/promPre*100*10)/10;
-  const dTotal=Math.round(((s5+s6proj)/2-promPre)/promPre*100*10)/10;
+  const promPre=Math.round(preS.reduce((s,r)=>s+r.TOTAL_CONTACTOS,0)/Math.max(1,preS.length));
+  // POST sem 1: 07-may al 13-may (7 dias exactos desde el cambio)
+  const post1Days=RAW_DIARIO.filter(r=>r.FECHA>='2026-05-07'&&r.FECHA<='2026-05-13');
+  const s1post=post1Days.reduce((s,r)=>s+r.TOTAL_CONTACTOS,0);
+  const s1days=post1Days.length;
+  // POST sem 2: 14-may en adelante (parcial), proyectado a 7 dias
+  const post2Days=RAW_DIARIO.filter(r=>r.FECHA>='2026-05-14');
+  const s2raw=post2Days.reduce((s,r)=>s+r.TOTAL_CONTACTOS,0);
+  const s2days=Math.max(1,post2Days.length);
+  const s2proj=Math.round(s2raw/s2days*7);
+  const lastDate=post2Days.length?post2Days[post2Days.length-1].FECHA.slice(5):'';
+  // Deltas vs PRE promedio
+  const d1=promPre>0?Math.round((s1post-promPre)/promPre*1000)/10:0;
+  const d2=promPre>0?Math.round((s2proj-promPre)/promPre*1000)/10:0;
+  const dTotal=promPre>0?Math.round(((s1post+s2proj)/2-promPre)/promPre*1000)/10:0;
   const pct=v=>'<span style="color:'+(v>0?'#1b5e20':'#c62828')+';font-size:12px">'+(v>0?'+':'')+v+'%</span>';
   const kpis=[
-    {l:'Prom. semanal PRE cambio',  v:promPre.toLocaleString(), s:'Sem 1-4 &middot; 09-abr al 05-may',       cls:''},
-    {l:'Sem 1 POST cambio (sem 5)', v:s5.toLocaleString(),      s:'06-12 may &middot; '+pct(d5)+' vs pre',    cls:'green'},
-    {l:'Sem 2 POST cambio (sem 6)', v:s6raw.toLocaleString(),   s:'13-16 may &middot; proy 7d: '+s6proj.toLocaleString()+' &middot; '+pct(d6), cls:'green'},
-    {l:'Cambio total POST vs PRE',  v:(dTotal>0?'+':'')+dTotal+'%', s:'Prom sem 5+6 vs prom sem 1-4',         cls:dTotal>=0?'green':'red'},
+    {l:'Prom. semanal PRE cambio',   v:promPre.toLocaleString(),  s:'Sem 1-4 &middot; 09-abr al 05-may (4 sem completas)', cls:''},
+    {l:'Sem 1 POST cambio',          v:s1post.toLocaleString(),   s:'07-13 may ('+s1days+' d&iacute;as) &middot; '+pct(d1)+' vs pre', cls:'green'},
+    {l:'Sem 2 POST cambio',          v:s2raw.toLocaleString(),    s:'14-may al '+lastDate+' &middot; proy 7d: '+s2proj.toLocaleString()+' &middot; '+pct(d2), cls:d2>=0?'green':'red'},
+    {l:'Cambio total POST vs PRE',   v:(dTotal>0?'+':'')+dTotal+'%', s:'Prom sem1+sem2proy vs prom PRE',                   cls:dTotal>=0?'green':'red'},
   ];
   document.getElementById('kpis').innerHTML=kpis.map(k=>`<div class="kpi ${k.cls}"><div class="label">${k.l}</div><div class="value">${k.v}</div><div class="sub">${k.s}</div></div>`).join('');
 }
