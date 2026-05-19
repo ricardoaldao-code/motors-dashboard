@@ -274,11 +274,12 @@ function buildKPIs(){
   const post1Days=RAW_DIARIO.filter(r=>r.FECHA>='2026-05-07'&&r.FECHA<='2026-05-13');
   const s1post=post1Days.reduce((s,r)=>s+r.TOTAL_CONTACTOS,0);
   const s1days=post1Days.length;
-  // POST sem 2: 14-may en adelante (parcial), proyectado a 7 dias
-  const post2Days=RAW_DIARIO.filter(r=>r.FECHA>='2026-05-14');
-  const s2raw=post2Days.reduce((s,r)=>s+r.TOTAL_CONTACTOS,0);
-  const s2days=Math.max(1,post2Days.length);
-  const s2proj=Math.round(s2raw/s2days*7);
+  // POST sem 2: S6 completa (13-may en adelante, misma base que grafico)
+  const sem6r=RAW_SEMANAL.find(r=>r.SEM===6);
+  const s2raw=sem6r?Math.round(sem6r.TOTAL_CONTACTOS):0;
+  const s2days=sem6r?sem6r.DIAS:1;
+  const s2proj=sem6r?Math.round(s2raw/s2days*7):0;
+  const post2Days=RAW_DIARIO.filter(r=>r.SEM===6);
   const lastDate=post2Days.length?post2Days[post2Days.length-1].FECHA.slice(5):'';
   // Deltas vs PRE promedio
   const d1=promPre>0?Math.round((s1post-promPre)/promPre*1000)/10:0;
