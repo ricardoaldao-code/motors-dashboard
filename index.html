@@ -17,7 +17,7 @@ header .sub{font-size:11px;opacity:.8;margin-left:auto;background:rgba(255,255,2
 .tab:hover{background:#f5f8ff;color:#1a73e8}
 .page{display:none;padding:18px 24px}
 .page.active{display:block}
-.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:18px}
 .kpi{background:#fff;border-radius:8px;padding:14px 16px;box-shadow:0 1px 3px rgba(0,0,0,.08);border-left:4px solid #1a73e8}
 .kpi.green{border-left-color:#34a853}.kpi.orange{border-left-color:#fbbc04}.kpi.purple{border-left-color:#9334e6}.kpi.red{border-left-color:#ea4335}
 .kpi .label{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
@@ -285,17 +285,19 @@ function buildKPIs(){
   const d2=promPre>0?Math.round((s2proj-promPre)/promPre*1000)/10:0;
   const dTotal=promPre>0?Math.round(((s1post+s2proj)/2-promPre)/promPre*1000)/10:0;
 
-  const preVibrancy=RAW_SEMANAL.filter(r=>r.SEM<=4);
-  const vPre=Math.round(preVibrancy.reduce((s,r)=>s+r.VIBRANCY,0)/Math.max(1,preVibrancy.length)*1000)/1000;
-  const sem5v=RAW_SEMANAL.find(r=>r.SEM===5);
-  const vPost=sem5v?Math.round(sem5v.VIBRANCY*1000)/1000:0;
-  const vDelta=vPre>0?Math.round((vPost-vPre)/vPre*100*10)/10:0;  const pct=v=>'<span style="color:'+(v>0?'#1b5e20':'#c62828')+';font-size:12px">'+(v>0?'+':'')+v+'%</span>';
+  const vc=ds=>{const tc=ds.reduce((s,r)=>s+r.TOTAL_CONTACTOS,0);const tl=ds.reduce((s,r)=>s+r.LL_ACTIVO,0);return tl>0?Math.round(tc/tl*30*1000)/1000:0;};
+  const dPre=DATA_DIARIO.filter(r=>r.FECHA<WA_CHANGE_DATE);
+  const dP1=DATA_DIARIO.filter(r=>r.FECHA>="2026-05-07"&&r.FECHA<="2026-05-13");
+  const dP2=DATA_DIARIO.filter(r=>r.FECHA>="2026-05-14");
+  const vPre=vc(dPre);const vPost=vc(dP1);const vPost2=vc(dP2);
+  const vDelta=vPre>0?Math.round((vPost-vPre)/vPre*100*10)/10:0;
+  const vDelta2=vPre>0?Math.round((vPost2-vPre)/vPre*100*10)/10:0;  const pct=v=>'<span style="color:'+(v>0?'#1b5e20':'#c62828')+';font-size:12px">'+(v>0?'+':'')+v+'%</span>';
   const kpis=[
     {l:'Prom. semanal PRE cambio',   v:promPre.toLocaleString(),  s:'Sem 1-4 &middot; 09-abr al 05-may &middot; preS='+preS.length+' sems', cls:''},
     {l:'Sem 1 POST cambio',          v:s1post.toLocaleString(),   s:'07-13 may &middot; '+s1days+' dias &middot; '+pct(d1)+' vs pre', cls:'green'},
     {l:'Sem 2 POST cambio',          v:s2raw.toLocaleString(),    s:'14-may al '+lastDate+' &middot; proy 7d: '+s2proj.toLocaleString()+' &middot; '+pct(d2), cls:d2>=0?'green':'red'},
     {l:'Vibrancia PRE (leads/LL x30)',v:vPre,s:'Prom sem 1-4',cls:''},
-    {l:'Vibrancia POST sem5 (x30)',v:vPost,s:'+'+(vDelta>0?vDelta:Math.abs(vDelta))+'% vs pre',cls:vDelta>=0?'green':'red'},
+    {l:'Vibrancia POST sem5 (x30)',v:vPost,s:'07-13may '+(vDelta>=0?'+':'')+vDelta+'% vs pre',cls:vDelta>=0?'green':'red'},{l:'Vibrancia POST sem6 (x30)',v:vPost2,s:'14-may+ '+(vDelta2>=0?'+':'')+vDelta2+'% vs pre',cls:vDelta2>=0?'green':'red'},
     {l:'Cambio total POST vs PRE',   v:(dTotal>0?'+':'')+dTotal+'%', s:'Prom sem1+sem2proy vs prom PRE',                   cls:dTotal>=0?'green':'red'},
   ];
   document.getElementById('kpis').innerHTML=kpis.map(k=>`<div class="kpi ${k.cls}"><div class="label">${k.l}</div><div class="value">${k.v}</div><div class="sub">${k.s}</div></div>`).join('');
@@ -568,7 +570,7 @@ function buildChartVibrancy(){
 }
 function buildChartVibrancySem(){
   const ctx=document.getElementById('cVibrancySem').getContext('2d');
-  const preAvg=DATA_SEMANAL.filter(r=>r.SEM<=4).reduce((s,r)=>s+(r.VIBRANCY||0),0)/Math.max(1,DATA_SEMANAL.filter(r=>r.SEM<=4).length);
+  const preAvg=typeof vc!=="undefined"?vc(DATA_DIARIO.filter(r=>r.FECHA<WA_CHANGE_DATE)):(DATA_SEMANAL.filter(r=>r.SEM<=4).reduce((s,r)=>s+(r.VIBRANCY||0),0)/Math.max(1,DATA_SEMANAL.filter(r=>r.SEM<=4).length));
   new Chart(ctx,{type:'bar',data:{
     labels:DATA_SEMANAL.map(r=>'S'+r.SEM+(r.INCOMPLETA?' *':'')),
     datasets:[
