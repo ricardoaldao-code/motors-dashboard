@@ -297,7 +297,7 @@ function buildChartDiario(){
     labels:DATA_DIARIO.map(r=>r.FECHA.slice(5)),
     datasets:[
       {label:'Total',data:DATA_DIARIO.map(r=>r.TOTAL_CONTACTOS),borderColor:'#1a73e8',backgroundColor:'rgba(26,115,232,.07)',tension:.3,pointRadius:1.5,fill:true,borderWidth:2},
-      {label:'WhatsApp',data:DATA_DIARIO.map(r=>r.WHATSAPP_UNICOS),borderColor:'#34a853',backgroundColor:'rgba(52,168,83,.05)',tension:.3,pointRadius:1.5,fill:true,borderWidth:2},
+      {label:'WhatsApp',data:DATA_DIARIO.map(r=>r.WHATSAPP_TOTAL),borderColor:'#34a853',backgroundColor:'rgba(52,168,83,.05)',tension:.3,pointRadius:1.5,fill:true,borderWidth:2},
     ]
   },options:{plugins:{legend:{position:'top',labels:{boxWidth:10,font:{size:11}}},datalabels:{display:false}},
     scales:{y:{beginAtZero:false,ticks:{font:{size:10}}}},interaction:{mode:'index',intersect:false}}});
@@ -311,8 +311,8 @@ function buildChartSemanal(){
   new Chart(ctx,{type:'bar',data:{
     labels:DATA_SEMANAL.map(r=>'S'+r.SEM+(r.INCOMPLETA?' *':'')),
     datasets:[
-      {label:'WhatsApp',data:DATA_SEMANAL.map(r=>r.WHATSAPP_UNICOS),backgroundColor:bg1,borderRadius:3},
-      {label:'Otros',data:DATA_SEMANAL.map(r=>r.TOTAL_CONTACTOS-r.WHATSAPP_UNICOS),backgroundColor:bg2,borderRadius:3},
+      {label:'WhatsApp',data:DATA_SEMANAL.map(r=>r.WHATSAPP_TOTAL),backgroundColor:bg1,borderRadius:3},
+      {label:'Otros',data:DATA_SEMANAL.map(r=>r.TOTAL_CONTACTOS-r.WHATSAPP_TOTAL),backgroundColor:bg2,borderRadius:3},
     ]
   },options:{plugins:{legend:{position:'top',labels:{boxWidth:10,font:{size:11}}},datalabels:{display:false}},scales:{x:{stacked:true},y:{stacked:true,beginAtZero:true}}}});
 }
@@ -322,7 +322,7 @@ function buildChartMix(){
   const ctx=document.getElementById('cMix').getContext('2d');
   new Chart(ctx,{type:'doughnut',data:{
     labels:['WhatsApp','Call','Preguntas'],
-    datasets:[{data:[last.WHATSAPP_UNICOS,last.CALL_UNICOS,last.PREGUNTAS_UNICOS],
+    datasets:[{data:[last.WHATSAPP_TOTAL,last.CALL_TOTAL,last.PREGUNTAS_TOTAL],
       backgroundColor:['#34a853','#4285f4','#fbbc04'],borderWidth:2}]
   },options:{plugins:{legend:{position:'right',labels:{boxWidth:10,font:{size:11}}},datalabels:{display:false}},cutout:'60%'}});
 }
@@ -388,7 +388,7 @@ function buildClusters(){
 
 // Column config
 const HIDE=new Set(['SOLICITUD_VISITA_UNICOS','QUOTATIONS_UNICOS','ORDEN','DIAS_PRE','DIAS_POST']);
-const NUMCOLS=new Set(['CALL_UNICOS','WHATSAPP_UNICOS','PREGUNTAS_UNICOS','TOTAL_CONTACTOS','RATE_DIARIA','WA_PROM_PRE','WA_PROM_POST','TOTAL_PROM_PRE','TOTAL_PROM_POST','DIAS','PROM_PRE_SEM','SEM5_LEADS','SEM6_PARCIAL','SEM6_PROY_7D']);
+const NUMCOLS=new Set(['CALL_TOTAL','WHATSAPP_TOTAL','PREGUNTAS_TOTAL','TOTAL_CONTACTOS','RATE_DIARIA','WA_PROM_PRE','WA_PROM_POST','TOTAL_PROM_PRE','TOTAL_PROM_POST','DIAS','PROM_PRE_SEM','SEM5_LEADS','SEM6_PARCIAL','SEM6_PROY_7D']);
 const FMTS={
   SEGMENTACION_NSM:v=>`<span class="badge ${nsm2b(v)}">${v}</span>`,
   CLUSTER:v=>`<span class="badge ${CLUSTER_BADGES[v]||'b-c6'}">${v}</span>`,
