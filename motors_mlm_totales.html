@@ -589,13 +589,15 @@ function buildChartVibrancySem(){
 }// Register datalabels plugin globally
 Chart.register(ChartDataLabels);
 
-// Init
-buildKPIs();
-buildChartDiario();buildChartSemanal();buildChartMix();buildChartDow();buildChartDowPct();
-renderTable('diario',state.diario.filtered,0,state.diario.pageSize);
-buildDetFilters();applyFilters();
-buildClusters();buildCFilters();applyCFilters();buildChartVibrancy();buildChartVibrancySem();
-buildCorrelaciones();
+// Init - each call wrapped in try/catch so one failure doesn't stop the rest
+const _run=(fn,name)=>{try{fn();}catch(e){console.error('[DASH]',name,e.message);}};
+_run(buildKPIs,'buildKPIs');
+_run(buildChartDiario,'cDiario');_run(buildChartSemanal,'cSemanal');_run(buildChartMix,'cMix');_run(buildChartDow,'cDow');_run(buildChartDowPct,'cDowPct');
+_run(()=>renderTable('diario',state.diario.filtered,0,state.diario.pageSize),'tableDiario');
+_run(buildDetFilters,'detFilters');_run(applyFilters,'applyFilters');
+_run(buildClusters,'buildClusters');_run(buildCFilters,'cFilters');_run(applyCFilters,'applyCFilters');
+_run(buildChartVibrancy,'cVibrancy');_run(buildChartVibrancySem,'cVibrancySem');
+_run(buildCorrelaciones,'correlaciones');
 </script>
 
 </body></html>
