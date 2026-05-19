@@ -576,7 +576,9 @@ function buildChartVibrancy(){
 }
 function buildChartVibrancySem(){
   const ctx=document.getElementById('cVibrancySem').getContext('2d');
-  const preAvg=typeof vc!=="undefined"?vc(DATA_DIARIO.filter(r=>r.FECHA<WA_CHANGE_DATE)):(DATA_SEMANAL.filter(r=>r.SEM<=4).reduce((s,r)=>s+(r.VIBRANCY||0),0)/Math.max(1,DATA_SEMANAL.filter(r=>r.SEM<=4).length));
+  const preDays=DATA_DIARIO.filter(r=>r.FECHA<WA_CHANGE_DATE);
+  const tPre=preDays.reduce((s,r)=>s+r.TOTAL_CONTACTOS,0),llPre=preDays.reduce((s,r)=>s+r.LL_ACTIVO,0);
+  const preAvg=llPre>0?Math.round(tPre/llPre*30*100)/100:0;
   new Chart(ctx,{type:'bar',data:{
     labels:DATA_SEMANAL.map(r=>'S'+r.SEM+(r.INCOMPLETA?' *':'')),
     datasets:[
