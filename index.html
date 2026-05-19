@@ -293,12 +293,13 @@ function buildKPIs(){
   const vDelta=vPre>0?Math.round((vPost-vPre)/vPre*100*10)/10:0;
   const vDelta2=vPre>0?Math.round((vPost2-vPre)/vPre*100*10)/10:0;  const pct=v=>'<span style="color:'+(v>0?'#1b5e20':'#c62828')+';font-size:12px">'+(v>0?'+':'')+v+'%</span>';
   const kpis=[
-    {l:'Prom. semanal PRE cambio',   v:promPre.toLocaleString(),  s:'Sem 1-4 &middot; 09-abr al 05-may &middot; preS='+preS.length+' sems', cls:''},
-    {l:'Sem 1 POST cambio',          v:s1post.toLocaleString(),   s:'07-13 may &middot; '+s1days+' dias &middot; '+pct(d1)+' vs pre', cls:'green'},
-    {l:'Sem 2 POST cambio',          v:s2raw.toLocaleString(),    s:'14-may al '+lastDate+' &middot; proy 7d: '+s2proj.toLocaleString()+' &middot; '+pct(d2), cls:d2>=0?'green':'red'},
-    {l:'Vibrancia PRE (leads/LL x30)',v:vPre,s:'Prom sem 1-4',cls:''},
-    {l:'Vibrancia POST sem5 (x30)',v:vPost,s:'07-13may '+(vDelta>=0?'+':'')+vDelta+'% vs pre',cls:vDelta>=0?'green':'red'},{l:'Vibrancia POST sem6 (x30)',v:vPost2,s:'14-may+ '+(vDelta2>=0?'+':'')+vDelta2+'% vs pre',cls:vDelta2>=0?'green':'red'},
-    {l:'Cambio total POST vs PRE',   v:(dTotal>0?'+':'')+dTotal+'%', s:'Prom sem1+sem2proy vs prom PRE',                   cls:dTotal>=0?'green':'red'},
+    {l:'Prom. semanal PRE cambio',   v:promPre.toLocaleString('es-MX'),  s:'Sem 1-4 &middot; 09-abr al 05-may', cls:''},
+    {l:'Sem 1 POST cambio',          v:s1post.toLocaleString('es-MX'),   s:'07-13 may &middot; '+s1days+' dias &middot; '+pct(d1)+' vs pre', cls:'green'},
+    {l:'Sem 2 POST cambio',          v:s2raw.toLocaleString('es-MX'),    s:'14-may al '+lastDate+' &middot; proy 7d: '+s2proj.toLocaleString('es-MX')+' &middot; '+pct(d2), cls:d2>=0?'green':'red'},
+    {l:'Vibrancia PRE (leads/LL x30)',v:vPre.toFixed(2),s:'09-abr al 06-may',cls:''},
+    {l:'Vibrancia POST sem5 (x30)',v:vPost.toFixed(2),s:'07-13may &middot; '+(vDelta>=0?'+':'')+vDelta+'% vs pre',cls:vDelta>=0?'green':'red'},
+    {l:'Vibrancia POST sem6 (x30)',v:vPost2.toFixed(2),s:'14-may+ &middot; '+(vDelta2>=0?'+':'')+vDelta2+'% vs pre',cls:vDelta2>=0?'green':'red'},
+    {l:'Cambio total POST vs PRE',   v:(dTotal>0?'+':'')+dTotal+'%', s:'Prom sem1+sem2proy vs prom PRE', cls:dTotal>=0?'green':'red'},
   ];
   document.getElementById('kpis').innerHTML=kpis.map(k=>`<div class="kpi ${k.cls}"><div class="label">${k.l}</div><div class="value">${k.v}</div><div class="sub">${k.s}</div></div>`).join('');
 }
