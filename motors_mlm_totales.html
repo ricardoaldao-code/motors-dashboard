@@ -450,13 +450,13 @@ function buildDetFilters(){
   fill('fAsesor',[...new Set(RAW_DETALLE.map(r=>r.ASESOR))].sort());
 }
 function applyFilters(){
-  const nsm=document.getElementById('fNsm').value,as=document.getElementById('fAsesor').value,cl=document.getElementById('fCluster').value,q=document.getElementById('fNombre').value.toLowerCase();
+  const nsm=document.getElementById('fNsm').value,as=document.getElementById('fAsesor').value,q=document.getElementById('fNombre').value.toLowerCase();
   const semF=document.getElementById('fSem')?.value||'';state.detalle.filtered=RAW_DETALLE.filter(r=>(!nsm||r.SEGMENTACION_NSM===nsm)&&(!as||r.ASESOR===as)&&(!semF||String(r.SEM)===semF)&&(!q||String(r.CUS_CUST_ID).includes(q)||String(r.NOMBRE_CLIENTE).toLowerCase().includes(q)));
   state.detalle.page=0;
   document.getElementById('det-count').textContent='('+state.detalle.filtered.length+' cuentas)';
   renderTable('detalle',state.detalle.filtered,0,state.detalle.pageSize);
 }
-function clearFilters(){['fNsm','fAsesor','fCluster'].forEach(id=>document.getElementById(id).value='');document.getElementById('fNombre').value='';applyFilters();}
+function clearFilters(){['fNsm','fAsesor'].forEach(id=>document.getElementById(id).value='');const fs=document.getElementById('fSem');if(fs)fs.value='';document.getElementById('fNombre').value='';applyFilters();}
 
 function buildCFilters(){
   const fill=(id,vals)=>{const el=document.getElementById(id);vals.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;el.appendChild(o);});};
