@@ -116,9 +116,9 @@ td.num{text-align:right;font-variant-numeric:tabular-nums}
       <div class="right"><button class="btn btn-primary" onclick="downloadCSV('detalle')">&#x2B07; Descargar CSV filtrado</button></div>
     </div>
     <div class="filters">
+      <label>Semana</label><select id="fSem" onchange="applyFilters()"><option value="">Todas</option><option value="1">S1</option><option value="2">S2</option><option value="3">S3</option><option value="4">S4</option><option value="5">S5</option><option value="6">S6</option></select>
       <label>Segmento</label><select id="fNsm" onchange="applyFilters()"><option value="">Todos</option></select>
       <label>Asesor</label><select id="fAsesor" onchange="applyFilters()"><option value="">Todos</option></select>
-      <label>Cluster</label><select id="fCluster" onchange="applyFilters()"><option value="">Todos</option></select>
       <input id="fNombre" placeholder="Buscar nombre / ID..." oninput="applyFilters()" style="min-width:180px">
       <button class="btn btn-clear" onclick="clearFilters()">&#x2715; Limpiar</button>
     </div>
@@ -251,7 +251,7 @@ const DATA_DETALLE_SUM=Object.values(dmap).map(d=>{
 // State
 const state={
   diario:  {data:DATA_DIARIO,     filtered:DATA_DIARIO,     page:0,pageSize:15},
-  detalle: {data:DATA_DETALLE_SUM,filtered:DATA_DETALLE_SUM,page:0,pageSize:50},
+  detalle: {data:RAW_DETALLE,filtered:RAW_DETALLE,page:0,pageSize:50},
   clusters:{data:DATA_DETALLE_SUM,filtered:DATA_DETALLE_SUM,page:0,pageSize:50},
 };
 let sortSt={};
@@ -446,12 +446,12 @@ function sortTable(id,col){
 
 function buildDetFilters(){
   const fill=(id,vals)=>{const el=document.getElementById(id);vals.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;el.appendChild(o);});};
-  fill('fNsm',[...new Set(DATA_DETALLE_SUM.map(r=>r.SEGMENTACION_NSM))].sort());
-  fill('fAsesor',[...new Set(DATA_DETALLE_SUM.map(r=>r.ASESOR))].sort());
+  fill('fNsm',[...new Set(RAW_DETALLE.map(r=>r.SEGMENTACION_NSM))].sort());
+  fill('fAsesor',[...new Set(RAW_DETALLE.map(r=>r.ASESOR))].sort());
 }
 function applyFilters(){
   const nsm=document.getElementById('fNsm').value,as=document.getElementById('fAsesor').value,cl=document.getElementById('fCluster').value,q=document.getElementById('fNombre').value.toLowerCase();
-  state.detalle.filtered=DATA_DETALLE_SUM.filter(r=>(!nsm||r.SEGMENTACION_NSM===nsm)&&(!as||r.ASESOR===as)&&(!cl||r.CLUSTER===cl)&&(!q||String(r.CUS_CUST_ID).includes(q)||String(r.NOMBRE_CLIENTE).toLowerCase().includes(q)));
+  const semF=document.getElementById('fSem')?.value||'';state.detalle.filtered=RAW_DETALLE.filter(r=>(!nsm||r.SEGMENTACION_NSM===nsm)&&(!as||r.ASESOR===as)&&(!semF||String(r.SEM)===semF)&&(!q||String(r.CUS_CUST_ID).includes(q)||String(r.NOMBRE_CLIENTE).toLowerCase().includes(q)));
   state.detalle.page=0;
   document.getElementById('det-count').textContent='('+state.detalle.filtered.length+' cuentas)';
   renderTable('detalle',state.detalle.filtered,0,state.detalle.pageSize);
