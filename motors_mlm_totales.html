@@ -285,11 +285,15 @@ function buildKPIs(){
   const d2=promPre>0?Math.round((s2proj-promPre)/promPre*1000)/10:0;
   const dTotal=promPre>0?Math.round(((s1post+s2proj)/2-promPre)/promPre*1000)/10:0;
 
-  const vc=ds=>{const tc=ds.reduce((s,r)=>s+r.TOTAL_CONTACTOS,0);const tl=ds.reduce((s,r)=>s+r.LL_ACTIVO,0);return tl>0?Math.round(tc/tl*30*1000)/1000:0;};
+  // vPre: tasa combinada del periodo pre (total/sum_LL_dias x30) - base para comparar
+  const vc=ds=>{const tc=ds.reduce((s,r)=>s+r.TOTAL_CONTACTOS,0);const tl=ds.reduce((s,r)=>s+r.LL_ACTIVO,0);return tl>0?Math.round(tc/tl*30*100)/100:0;};
   const dPre=DATA_DIARIO.filter(r=>r.FECHA<WA_CHANGE_DATE);
-  const dP1=DATA_DIARIO.filter(r=>r.FECHA>="2026-05-07"&&r.FECHA<="2026-05-13");
-  const dP2=DATA_DIARIO.filter(r=>r.FECHA>="2026-05-14");
-  const vPre=vc(dPre);const vPost=vc(dP1);const vPost2=vc(dP2);
+  const vPre=vc(dPre);
+  // vPost/vPost2: desde RAW_SEMANAL para coincidir exactamente con el grafico
+  const sem5v=RAW_SEMANAL.find(r=>r.SEM===5);
+  const sem6v=RAW_SEMANAL.find(r=>r.SEM===6);
+  const vPost=sem5v?sem5v.VIBRANCY:0;
+  const vPost2=sem6v?sem6v.VIBRANCY:0;
   const vDelta=vPre>0?Math.round((vPost-vPre)/vPre*100*10)/10:0;
   const vDelta2=vPre>0?Math.round((vPost2-vPre)/vPre*100*10)/10:0;  const pct=v=>'<span style="color:'+(v>0?'#1b5e20':'#c62828')+';font-size:12px">'+(v>0?'+':'')+v+'%</span>';
   const kpis=[
