@@ -578,6 +578,7 @@ function buildChartVibrancySem(){
       {type:'line',label:'Prom PRE',data:DATA_SEMANAL.map(()=>preAvg),borderColor:'#fbbc04',borderDash:[5,4],pointRadius:0,borderWidth:1.5,datalabels:{display:false}},
     ]
   },options:{plugins:{legend:{position:'top',labels:{boxWidth:10,font:{size:11}}},datalabels:{anchor:'end',align:'top',color:'#333',font:{size:10},formatter:v=>v.toFixed(2)}},scales:{y:{beginAtZero:false}}}});
+}
 // Register datalabels plugin globally
 Chart.register(ChartDataLabels);
 
